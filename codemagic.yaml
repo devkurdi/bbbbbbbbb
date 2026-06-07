@@ -1,20 +1,16 @@
 workflows:
-  android-kotlin-workflow:
-    name: Android Kotlin Build
-    max_build_duration: 60
+  kotlin-script-workflow:
+    name: Kotlin Project Build
+    max_build_duration: 10
     instance_type: mac_mini_m1
     environment:
-      android_ndk: 25.2.9519653
       java: 17
     triggering:
       events:
         - push
     scripts:
-      - name: Set up local.properties
-        script: | 
-          echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
-      - name: Build Android APK
-        script: | 
-          ./gradlew assembleDebug
+      - name: Compile Kotlin Code
+        script: |
+          kotlinc bkack.kt -include-runtime -d myapp.jar
     artifacts:
-      - app/build/outputs/apk/**/*.apk
+      - myapp.jar
