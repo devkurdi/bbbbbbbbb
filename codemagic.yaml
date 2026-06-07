@@ -9,6 +9,9 @@ workflows:
       events:
         - push
     scripts:
+      - name: Install Kotlin Compiler
+        script: |
+          brew install kotlin
       - name: Compile Kotlin Code
         script: |
           kotlinc bkack.kt -include-runtime -d myapp.jar
