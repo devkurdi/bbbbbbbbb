@@ -12,23 +12,20 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Initialize Android Project
+      - name: Initialize Android Project Structure
         run: |
-          # دروستکرنا فۆڵدەران ب شێوازەکێ گشتی و سادە
           mkdir -p app/src/main/java/com/devkurdi/black
           mkdir -p app/src/main/res/drawable
 
-          # کۆپیکردنا کۆدێ کاتلین ئەگەر هەبیت
           if [ -f "MainActivity.kt" ]; then
             cp MainActivity.kt app/src/main/java/com/devkurdi/black/
           fi
 
-          # گواستنەوەیا وێنەیێ ئایکۆنی ژ لاپەڕەیا سەرەکی
           if [ -f "ic_launcher.png" ]; then
             cp ic_launcher.png app/src/main/res/drawable/
           fi
 
-          # دروستکردنی فایلی مانیفێست یێ سادەکری
+          # دروستکردنی فایلی فەرمی یێ مانیفێست
           echo '<?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
               <application
@@ -46,7 +43,7 @@ jobs:
               </application>
           </manifest>' > app/src/main/AndroidManifest.xml
 
-          # دروستکردنی فایلێن سەرەکی یێن Gradle
+          # ڕێکخستنا فایلێن کۆنترۆڵکرنا کەمپایڵێ
           echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
           echo "rootProject.name = 'black'" > settings.gradle
           
@@ -82,5 +79,14 @@ jobs:
           }
           ' > app/build.gradle
 
-      - name: Verify Setup
-        run: echo "پرۆسەیا ئامادەکردنی فایلان ب سەرکەفتیانە خلاس بوو!"
+      - name: Setup Gradle Build Tool
+        run: gradle wrapper --gradle-version 8.1.1
+
+      - name: Compile and Build APK File
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Upload Finished APK to Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: Black-Blue-App
+          path: app/build/outputs/apk/debug/app-debug.apk
