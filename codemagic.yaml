@@ -9,24 +9,19 @@ workflows:
       events:
         - push
     scripts:
-      - name: Setup Android Environment
+      - name: Setup Android Structure
         script: |
           mkdir -p app/src/main/java/com/devkurdi/black
           cp MainActivity.kt app/src/main/java/com/devkurdi/black/
-          
-          # دروستکردنی فایلی ڕێکخستنی سەرەکی
           echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
-          
-          # ئامادەکردنی فایلی لۆجیک بۆ دروستکردنی فایلی فەرمی
           echo '
           plugins {
               id "com.android.application" version "8.1.1" apply false
               id "org.jetbrains.kotlin.android" version "1.8.10" apply false
           }
           ' > build.gradle
-      - name: Build Official Android Package
+      - name: Build Android APK
         script: |
-          echo "ب سەرکەوتبوویی کۆد هاتە کەمپایڵکردن!"
-          # لێرەدا فایلی ئەپڵیکەیشن جێبەجێ دەبێت
+          echo "Building process started..."
     artifacts:
       - "*.kt"
