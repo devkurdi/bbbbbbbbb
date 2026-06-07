@@ -5,22 +5,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      
       - name: set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
+          
       - name: Setup Project Structure and App Icon
         run: |
+          # دروستکردنی فۆڵدەرێن فەرمی یێن ئەندرۆیدێ ب شێوازێ ئۆتۆماتیکی د ناو سێرڤەری دا
           mkdir -p app/src/main/java/com/devkurdi/black
           mkdir -p app/src/main/res/drawable
           
-          cp MainActivity.kt app/src/main/java/com/devkurdi/black/
-          
-          if [ -f "ic_launcher.png" ]; then
-            cp ic_launcher.png app/src/main/res/drawable/
+          # کۆپیکردنا کۆدێ سەرەکی بۆ جهێ وێ
+          if [ -f "MainActivity.kt" ]; then
+            cp MainActivity.kt app/src/main/java/com/devkurdi/black/
           fi
           
+          # 🚀 ل ڤێرێ سێرڤەر وێنەی ژ لاپەڕەیا سەرەکی ڕادەکەت و دکەتە ئایکۆن
+          if [ -f "ic_launcher.png" ]; then
+            cp ic_launcher.png app/src/main/res/drawable/
+          else
+            echo "ئاگەهداری: وێنەیێ ic_launcher.png د لاپەڕەیا سەرەکی دا نەهاتە دۆزینەوە!"
+          fi
+          
+          # دروستکردنی فایلی مانیفێست بۆ ناساندنا ئایکۆنێ ل سەر مۆبایلێ
           echo '<?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
               <application
@@ -39,6 +49,7 @@ jobs:
               </application>
           </manifest>' > app/src/main/AndroidManifest.xml
 
+          # ڕێکخستنا فایلێن Gradle بۆ کەمپایڵکرنەکا سەرکەفتی
           echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
           
           echo '
@@ -47,5 +58,42 @@ jobs:
               id "org.jetbrains.kotlin.android" version "1.8.10" apply false
           }
           ' > build.gradle
-      - name: Build Android APK
-        run: echo "پرۆسەیا فەرمی یا دروستکردنی فایلی APK دەستپێکر..."
+          
+          echo '
+          plugins {
+              id "com.android.application"
+              id "org.jetbrains.kotlin.android"
+          }
+          android {
+              namespace "com.devkurdi.black"
+              compileSdk 33
+              defaultConfig {
+                  applicationId "com.devkurdi.black"
+                  minSdk 24
+                  targetSdk 33
+                  versionCode 1
+                  versionName "1.0"
+              }
+          }
+          dependencies {
+              implementation "androidx.core:core-ktx:1.9.0"
+              implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.6.1"
+              implementation "androidx.activity:activity-compose:1.7.0"
+              implementation platform("androidx.compose:compose-bom:2023.03.00")
+              implementation "androidx.compose.ui:ui"
+              implementation "androidx.compose.ui:ui-graphics"
+              implementation "androidx.compose.material3:material3"
+          }
+          ' > app/build.gradle
+          
+          echo "rootProject.name = 'black'" > settings.gradle
+          chmod +x gradlew || true
+
+      - name: Build Official Android APK
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Upload Finished APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: Black-Blue-App
+          path: app/build/outputs/apk/debug/app-debug.apk
