@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun BeautifulBlueApp() {
     var xpCount by remember { mutableStateOf(100) }
-    var currentScreenStatus by remember { mutableStateOf("بخێرهاتی بۆ پڕۆژەیێ فەرمی یێ BLACK") }
+    var currentScreenStatus by remember { mutableStateOf("بخێرهاتی بۆ پڕۆژەیێ فەرمی یێ BLACK 🚀") }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(16.dp),
