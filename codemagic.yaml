@@ -1,7 +1,7 @@
 workflows:
-  kotlin-script-workflow:
-    name: Kotlin Project Build
-    max_build_duration: 10
+  android-kotlin-workflow:
+    name: Build Black Blue App
+    max_build_duration: 30
     instance_type: mac_mini_m1
     environment:
       java: 17
@@ -9,11 +9,31 @@ workflows:
       events:
         - push
     scripts:
-      - name: Install Kotlin Compiler
+      - name: Create Basic Android Structure
         script: |
-          brew install kotlin
-      - name: Compile Kotlin Code
+          mkdir -p app/src/main/java/com/devkurdi/black
+          mv MainActivity.kt app/src/main/java/com/devkurdi/black/
+          
+          # دروستکرنا فایلێ build.gradle ب شێوازێ خێرا بۆ کەمپایڵێ
+          echo '
+          plugins {
+              id "com.android.application"
+              id "org.jetbrains.kotlin.android"
+          }
+          android {
+              namespace "com.devkurdi.black"
+              compileSdk 34
+              defaultConfig {
+                  applicationId "com.devkurdi.black"
+                  minSdk 24
+                  targetSdk 34
+                  versionCode 1
+                  versionName "1.0"
+              }
+          }
+          ' > build.gradle
+      - name: Build Android APK
         script: |
-          kotlinc bkack.kt -include-runtime -d myapp.jar
+          ./gradlew assembleDebug
     artifacts:
-      - myapp.jar
+      - app/build/outputs/apk/**/*.apk
